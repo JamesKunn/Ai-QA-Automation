@@ -1,11 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0f;
-  --foreground: #ededed;
-  --portal-deep: #0a0a0f;
-  --portal-blend: #0e1219;
-  --portal-surface: #121a2e;
+  --background: #2f123d;
+  --foreground: #ece6f0;
+  --foreground-muted: #a89bb5;
+  --portal-start: rgb(47, 18, 61);
+  --portal-dark: rgb(17, 12, 20);
+  --portal-end: rgb(27, 10, 36);
+  --accent: #c9b3d9;
+  --accent-bright: #dcc9eb;
+  --gradient-vertical: linear-gradient(
+    180deg,
+    rgba(47, 18, 61, 1) 46%,
+    rgba(17, 12, 20, 1) 92%,
+    rgba(27, 10, 36, 1) 100%
+  );
 }
 
 @theme inline {
@@ -16,18 +25,29 @@
 }
 
 body {
-  background-color: var(--portal-deep);
-  background-image: linear-gradient(
-    180deg,
-    var(--portal-surface) 0%,
-    var(--portal-blend) 20%,
-    var(--portal-deep) 45%,
-    var(--portal-deep) 100%
-  );
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-size: cover;
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   min-height: 100%;
+  background-image: var(--gradient-vertical);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      rgba(201, 179, 217, 0.02),
+      rgba(201, 179, 217, 0.02) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  opacity: 0.08;
+  mix-blend-mode: overlay;
 }

@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0f;
+  --foreground: #ededed;
+  --portal-deep: #0a0a0f;
+  --portal-blend: #0e1219;
+  --portal-surface: #121a2e;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background-color: var(--portal-deep);
+  background-image: linear-gradient(
+    180deg,
+    var(--portal-surface) 0%,
+    var(--portal-blend) 20%,
+    var(--portal-deep) 45%,
+    var(--portal-deep) 100%
+  );
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  min-height: 100%;
+}

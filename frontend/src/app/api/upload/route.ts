@@ -1,5 +1,3 @@
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { NextResponse } from "next/server";
 import {
   isAllowedFile,
@@ -8,8 +6,6 @@ import {
 } from "@/lib/allowed-file-types";
 
 export const runtime = "nodejs";
-
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 
 export async function POST(request: Request) {
   try {
@@ -23,9 +19,7 @@ export async function POST(request: Request) {
       );
     }
 
-    await mkdir(UPLOAD_DIR, { recursive: true });
-
-    const saved: { name: string; size: number }[] = [];
+    const accepted: File[] = [];
     const errors: string[] = [];
 
     for (const entry of entries) {
@@ -44,37 +38,24 @@ export async function POST(request: Request) {
         continue;
       }
 
-      const safeName = entry.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const timestamp = Date.now();
-      const storedName = `${timestamp}-${safeName}`;
-      const buffer = Buffer.from(await entry.arrayBuffer());
-      const filePath = path.join(UPLOAD_DIR, storedName);
-
-      await writeFile(filePath, buffer);
-      saved.push({ name: entry.name, size: entry.size });
+      accepted.push(entry);
     }
 
-    if (saved.length === 0) {
+    if (accepted.length === 0) {
       return NextResponse.json(
         { error: errors.join(" ") || "Upload failed." },
         { status: 400 },
       );
     }
 
-    // Forward to n8n webhook if N8N_WEBHOOK_URL is set
     const n8nUrl = process.env.N8N_WEBHOOK_URL;
     let n8nStatus = "n8n integration inactive (N8N_WEBHOOK_URL is not set)";
 
     if (n8nUrl) {
       try {
         const n8nFormData = new FormData();
-        
-        // Retrieve original entries again to send exact files
-        for (const entry of entries) {
-          if (entry instanceof File && isAllowedFile(entry) && entry.size <= MAX_FILE_SIZE_BYTES) {
-            // Re-create the file to ensure proper headers/naming
-            n8nFormData.append("files", entry, entry.name);
-          }
+        for (const file of accepted) {
+          n8nFormData.append("files", file, file.name);
         }
 
         const response = await fetch(n8nUrl, {
@@ -82,19 +63,17 @@ export async function POST(request: Request) {
           body: n8nFormData,
         });
 
-        if (response.ok) {
-          n8nStatus = `Success: Forwarded to n8n (${response.status})`;
-        } else {
-          n8nStatus = `Failed: n8n returned status ${response.status}`;
-        }
+        n8nStatus = response.ok
+          ? `Success: Forwarded to n8n (${response.status})`
+          : `Failed: n8n returned status ${response.status}`;
       } catch (err: any) {
         n8nStatus = `Error: Failed to connect to n8n (${err.message || err})`;
       }
     }
 
     return NextResponse.json({
-      message: `Successfully uploaded ${saved.length} file(s).`,
-      files: saved,
+      message: `Successfully uploaded ${accepted.length} file(s).`,
+      files: accepted.map((f) => ({ name: f.name, size: f.size })),
       n8nStatus,
       errors: errors.length > 0 ? errors : undefined,
     });

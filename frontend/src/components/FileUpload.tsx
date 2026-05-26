@@ -48,6 +48,9 @@ export default function FileUpload() {
   const [isDragging, setIsDragging] = useState(false);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [message, setMessage] = useState<string | null>(null);
+  const [processedResults, setProcessedResults] = useState<
+    Record<string, { ready: boolean; url?: string; polling: boolean }>
+  >({});
 
   useEffect(() => {
     if (!message || status === "uploading" || status === "idle") return;
@@ -59,6 +62,45 @@ export default function FileUpload() {
 
     return () => clearTimeout(timer);
   }, [message, status]);
+
+  // Polling hook to check for results from n8n
+  useEffect(() => {
+    const pollingFiles = Object.entries(processedResults).filter(
+      ([_, val]) => val.polling && !val.ready
+    );
+
+    if (pollingFiles.length === 0) return;
+
+    const interval = setInterval(async () => {
+      let updated = false;
+      const nextResults = { ...processedResults };
+
+      for (const [filename] of pollingFiles) {
+        try {
+          const res = await fetch(`/api/results?name=${encodeURIComponent(filename)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.ready) {
+              nextResults[filename] = {
+                ready: true,
+                url: data.downloadUrl,
+                polling: false,
+              };
+              updated = true;
+            }
+          }
+        } catch (err) {
+          console.error("Polling error for", filename, err);
+        }
+      }
+
+      if (updated) {
+        setProcessedResults(nextResults);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [processedResults]);
 
   const addFiles = useCallback((files: FileList | File[]) => {
     const incoming = Array.from(files).map((file) => ({
@@ -128,6 +170,16 @@ export default function FileUpload() {
         ? `${data.message} | ${data.n8nStatus}`
         : data.message;
       setMessage(displayMessage);
+
+      // Start polling for n8n results for each successfully uploaded file
+      const newPollers = { ...processedResults };
+      if (data.files && Array.isArray(data.files)) {
+        for (const f of data.files) {
+          newPollers[f.name] = { ready: false, polling: true };
+        }
+      }
+      setProcessedResults(newPollers);
+
       setSelected([]);
       if (inputRef.current) inputRef.current.value = "";
     } catch {
@@ -265,6 +317,61 @@ export default function FileUpload() {
                 >
                   Remove
                 </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {Object.keys(processedResults).length > 0 && (
+        <div
+          className="mt-6 overflow-hidden rounded-2xl border backdrop-blur-xl"
+          style={{
+            borderColor: "rgba(167, 139, 250, 0.22)",
+            background: SURFACE_GRADIENT,
+            boxShadow: "0 0 0 1px rgba(167,139,250,0.08) inset",
+          }}
+        >
+          <div
+            className="flex items-center justify-between border-b px-4 py-3"
+            style={{ borderColor: "rgba(167, 139, 250, 0.1)" }}
+          >
+            <span className="text-sm font-semibold text-[#ddd6fe]">
+              Process Outputs (n8n AI Engine)
+            </span>
+          </div>
+
+          <ul className="divide-y divide-[rgba(167,139,250,0.08)]">
+            {Object.entries(processedResults).map(([filename, info]) => (
+              <li
+                key={filename}
+                className="flex items-center justify-between gap-3 px-4 py-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-[#f0ecf4]">
+                    {filename}
+                  </p>
+                  <p className="text-xs text-[#8f8798]">
+                    {info.ready ? (
+                      <span className="text-[#c4b5fd] font-medium">Ready for download</span>
+                    ) : (
+                      <span className="text-[#c4b5fd]/60 animate-pulse flex items-center gap-1.5">
+                        Processing in n8n...
+                      </span>
+                    )}
+                  </p>
+                </div>
+                {info.ready && info.url ? (
+                  <a
+                    href={info.url}
+                    download
+                    className="shrink-0 rounded-lg bg-[rgba(167,139,250,0.12)] px-3.5 py-1.5 text-xs font-semibold text-[#ddd6fe] border border-[#a78bfa]/25 transition-all hover:bg-[rgba(167,139,250,0.22)] hover:border-[#c4b5fd]/45 hover:text-white"
+                  >
+                    Download Output
+                  </a>
+                ) : (
+                  <div className="mr-3 h-4 w-4 animate-spin rounded-full border border-[#a78bfa]/20 border-t-[#c4b5fd]" />
+                )}
               </li>
             ))}
           </ul>

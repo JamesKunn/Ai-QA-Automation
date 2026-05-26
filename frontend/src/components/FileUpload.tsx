@@ -124,7 +124,10 @@ export default function FileUpload() {
       }
 
       setStatus("success");
-      setMessage(data.message);
+      const displayMessage = data.n8nStatus
+        ? `${data.message} | ${data.n8nStatus}`
+        : data.message;
+      setMessage(displayMessage);
       setSelected([]);
       if (inputRef.current) inputRef.current.value = "";
     } catch {

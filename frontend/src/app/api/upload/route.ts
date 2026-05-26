@@ -61,14 +61,46 @@ export async function POST(request: Request) {
       );
     }
 
+    // Forward to n8n webhook if N8N_WEBHOOK_URL is set
+    const n8nUrl = process.env.N8N_WEBHOOK_URL;
+    let n8nStatus = "n8n integration inactive (N8N_WEBHOOK_URL is not set)";
+
+    if (n8nUrl) {
+      try {
+        const n8nFormData = new FormData();
+        
+        // Retrieve original entries again to send exact files
+        for (const entry of entries) {
+          if (entry instanceof File && isAllowedFile(entry) && entry.size <= MAX_FILE_SIZE_BYTES) {
+            // Re-create the file to ensure proper headers/naming
+            n8nFormData.append("files", entry, entry.name);
+          }
+        }
+
+        const response = await fetch(n8nUrl, {
+          method: "POST",
+          body: n8nFormData,
+        });
+
+        if (response.ok) {
+          n8nStatus = `Success: Forwarded to n8n (${response.status})`;
+        } else {
+          n8nStatus = `Failed: n8n returned status ${response.status}`;
+        }
+      } catch (err: any) {
+        n8nStatus = `Error: Failed to connect to n8n (${err.message || err})`;
+      }
+    }
+
     return NextResponse.json({
       message: `Successfully uploaded ${saved.length} file(s).`,
       files: saved,
+      n8nStatus,
       errors: errors.length > 0 ? errors : undefined,
     });
-  } catch {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Something went wrong while uploading." },
+      { error: `Something went wrong while uploading: ${error.message || error}` },
       { status: 500 },
     );
   }

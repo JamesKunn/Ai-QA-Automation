@@ -14,11 +14,14 @@ type UploadStatus = "idle" | "uploading" | "success" | "error";
 
 const NOTIFICATION_AUTO_CLOSE_MS = 5000;
 
-const VERTICAL_GRADIENT =
-  "linear-gradient(180deg, rgba(47,18,61,0.75) 46%, rgba(17,12,20,0.8) 92%, rgba(27,10,36,0.85) 100%)";
-
 const SURFACE_GRADIENT =
-  "linear-gradient(180deg, rgba(55,28,68,0.88) 0%, rgba(47,18,61,0.9) 46%, rgba(28,18,34,0.92) 100%)";
+  "linear-gradient(180deg, rgba(16,13,22,0.95) 0%, rgba(8,6,11,0.98) 55%, rgba(10,8,14,0.98) 100%)";
+
+const BUTTON_PRIMARY =
+  "linear-gradient(180deg, #ddd6fe 0%, #c4b5fd 40%, #a78bfa 100%)";
+
+const BUTTON_DISABLED =
+  "linear-gradient(180deg, rgba(16,13,22,0.95) 0%, rgba(8,6,11,0.98) 100%)";
 
 type SelectedFile = {
   id: string;
@@ -155,15 +158,15 @@ export default function FileUpload() {
         onClick={() => inputRef.current?.click()}
         className={`group relative cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed px-8 py-14 text-center transition-[border-color,background-color] ${
           isDragging
-            ? "border-[#dcc9eb]/80"
-            : "border-[#c9b3d9]/45 hover:border-[#dcc9eb]/65"
+            ? "border-[#c4b5fd]/70"
+            : "border-[#a78bfa]/30 hover:border-[#c4b5fd]/50"
         }`}
         style={{
           background: isDragging
-            ? "linear-gradient(180deg, rgba(201,179,217,0.16) 0%, rgba(47,18,61,0.6) 46%, rgba(17,12,20,0.65) 100%)"
+            ? "linear-gradient(180deg, rgba(167,139,250,0.1) 0%, rgba(12,9,18,0.95) 55%, rgba(6,5,9,0.98) 100%)"
             : SURFACE_GRADIENT,
           boxShadow:
-            "0 0 0 1px rgba(201,179,217,0.2) inset, 0 8px 28px rgba(0,0,0,0.4)",
+            "0 0 0 1px rgba(167,139,250,0.12) inset, 0 8px 32px rgba(0,0,0,0.55)",
         }}
       >
         <div
@@ -171,7 +174,7 @@ export default function FileUpload() {
           className="pointer-events-none absolute inset-0 rounded-3xl"
           style={{
             backgroundImage:
-              "linear-gradient(180deg, rgba(201,179,217,0.1) 0%, transparent 46%, rgba(17,12,20,0.1) 100%), linear-gradient(rgba(201,179,217,0.06) 1px, transparent 1px)",
+              "linear-gradient(180deg, rgba(167,139,250,0.06) 0%, transparent 46%, rgba(4,3,6,0.2) 100%), linear-gradient(rgba(167,139,250,0.04) 1px, transparent 1px)",
             backgroundSize: "auto, 28px 28px",
             opacity: isDragging ? 0.95 : 0.75,
           }}
@@ -188,23 +191,23 @@ export default function FileUpload() {
           }}
         />
         <div
-          className="relative mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full text-[#dcc9eb]"
+          className="relative mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full text-[#c4b5fd]"
           style={{
             background:
-              "linear-gradient(180deg, rgba(201,179,217,0.22) 0%, rgba(47,18,61,0.3) 46%, rgba(27,10,36,0.35) 100%)",
+              "linear-gradient(180deg, rgba(167,139,250,0.18) 0%, rgba(12,9,18,0.9) 55%, rgba(6,5,9,0.95) 100%)",
             boxShadow:
-              "0 0 0 1px rgba(201,179,217,0.22) inset, 0 0 28px rgba(47,18,61,0.35)",
+              "0 0 0 1px rgba(167,139,250,0.2) inset, 0 0 24px rgba(124,58,237,0.2)",
           }}
         >
           <div className="relative">
             <UploadIcon />
           </div>
         </div>
-        <p className="relative text-lg font-semibold text-[#ece6f0] drop-shadow-[0_0_14px_rgba(201,179,217,0.2)]">
+        <p className="relative text-lg font-semibold text-[#f0ecf4] drop-shadow-[0_0_12px_rgba(167,139,250,0.12)]">
           Drop files here or click to browse
         </p>
 
-        <p className="relative mt-2 text-sm text-[#a89bb5]">
+        <p className="relative mt-2 text-sm text-[#8f8798]">
           CSV, PDF, and DOCX only — up to {MAX_FILE_SIZE_LABEL} each
         </p>
       </div>
@@ -213,38 +216,38 @@ export default function FileUpload() {
         <div
           className="mt-6 overflow-hidden rounded-2xl border backdrop-blur-xl"
           style={{
-            borderColor: "rgba(201, 179, 217, 0.28)",
+            borderColor: "rgba(167, 139, 250, 0.22)",
             background: SURFACE_GRADIENT,
-            boxShadow: "0 0 0 1px rgba(201,179,217,0.12) inset",
+            boxShadow: "0 0 0 1px rgba(167,139,250,0.08) inset",
           }}
         >
           <div
             className="flex items-center justify-between border-b px-4 py-3"
-            style={{ borderColor: "rgba(201, 179, 217, 0.12)" }}
+            style={{ borderColor: "rgba(167, 139, 250, 0.1)" }}
           >
-            <span className="text-sm font-medium text-[#c9b3d9]">
+            <span className="text-sm font-medium text-[#c4b5fd]">
               {selected.length} file{selected.length !== 1 ? "s" : ""} selected
             </span>
             <button
               type="button"
               onClick={clearAll}
-              className="text-sm text-[#a89bb5] hover:text-[#dcc9eb]"
+              className="text-sm text-[#8f8798] transition-colors hover:text-[#ddd6fe]"
             >
               Clear all
             </button>
           </div>
 
-          <ul className="divide-y divide-[rgba(201,179,217,0.1)]">
+          <ul className="divide-y divide-[rgba(167,139,250,0.08)]">
             {selected.map(({ id, file, error }) => (
               <li
                 key={id}
                 className="flex items-center justify-between gap-3 px-4 py-3"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-[#ece6f0]">
+                  <p className="truncate text-sm font-medium text-[#f0ecf4]">
                     {file.name}
                   </p>
-                  <p className="text-xs text-[#a89bb5]">
+                  <p className="text-xs text-[#8f8798]">
                     {formatFileSize(file.size)}
                     {error && (
                       <span className="ml-2 text-[#e8a8c8]">— {error}</span>
@@ -254,7 +257,7 @@ export default function FileUpload() {
                 <button
                   type="button"
                   onClick={() => removeFile(id)}
-                  className="shrink-0 rounded-lg px-2 py-1 text-xs text-[#c9b3d9] hover:bg-[rgba(201,179,217,0.12)] hover:text-[#ece6f0]"
+                  className="shrink-0 rounded-lg px-2 py-1 text-xs text-[#c4b5fd] transition-colors hover:bg-[rgba(167,139,250,0.12)] hover:text-[#f0ecf4]"
                   aria-label={`Remove ${file.name}`}
                 >
                   Remove
@@ -270,29 +273,32 @@ export default function FileUpload() {
           type="button"
           onClick={handleUpload}
           disabled={status === "uploading" || validFiles.length === 0}
-          className="inline-flex h-12 items-center justify-center rounded-3xl px-8 text-sm font-semibold transition-[transform,box-shadow,background-color,border-color,filter] hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-12 items-center justify-center rounded-3xl px-8 text-sm font-semibold transition-[transform,box-shadow,background-color,border-color,filter] hover:translate-y-[-1px] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-55"
           style={{
-            border: "1px solid rgba(201,179,217,0.4)",
+            border:
+              validFiles.length > 0 && status !== "uploading"
+                ? "1px solid rgba(221,214,254,0.5)"
+                : "1px solid rgba(167,139,250,0.35)",
             color:
               validFiles.length > 0 && status !== "uploading"
-                ? "#1b0a24"
-                : "#dcc9eb",
+                ? "#1a0f2e"
+                : "#c4b5fd",
             background:
               validFiles.length > 0 && status !== "uploading"
-                ? "linear-gradient(180deg, rgba(220,201,235,0.95) 0%, rgba(201,179,217,0.9) 46%, rgba(168,145,190,0.95) 100%)"
-                : VERTICAL_GRADIENT,
+                ? BUTTON_PRIMARY
+                : BUTTON_DISABLED,
             boxShadow:
               status === "uploading"
-                ? "0 0 0 1px rgba(201,179,217,0.2) inset, 0 10px 30px rgba(27,10,36,0.5)"
+                ? "0 0 0 1px rgba(167,139,250,0.25) inset, 0 8px 28px rgba(0,0,0,0.5), 0 0 20px rgba(124,58,237,0.25)"
                 : validFiles.length > 0
-                  ? "0 0 0 1px rgba(220,201,235,0.35) inset, 0 14px 44px rgba(27,10,36,0.55), 0 0 28px rgba(201,179,217,0.2)"
-                  : "0 0 0 1px rgba(201,179,217,0.12) inset, 0 14px 40px rgba(27,10,36,0.5), 0 0 22px rgba(47,18,61,0.35)",
+                  ? "0 0 0 1px rgba(255,255,255,0.2) inset, 0 12px 36px rgba(0,0,0,0.5), 0 0 32px rgba(124,58,237,0.45)"
+                  : "0 0 0 1px rgba(167,139,250,0.15) inset, 0 8px 28px rgba(0,0,0,0.45)",
           }}
         >
           {status === "uploading" ? "Uploading…" : "Upload files"}
         </button>
 
-        <p className="text-xs text-[#a89bb5]">
+        <p className="text-xs text-[#8f8798]">
           Allowed: {ACCEPTED_EXTENSIONS.join(", ")}
         </p>
       </div>
@@ -302,14 +308,14 @@ export default function FileUpload() {
           role="status"
           className={`mt-4 rounded-xl px-4 py-3 text-sm backdrop-blur-xl ${
             status === "success"
-              ? "text-[#ece6f0] ring-1 ring-[#c9b3d9]/30"
-              : "text-[#e8a8c8] ring-1 ring-[#c9b3d9]/15"
+              ? "text-[#f0ecf4] ring-1 ring-[#a78bfa]/35"
+              : "text-[#f0a8c8] ring-1 ring-[#a78bfa]/15"
           }`}
           style={{
             background:
               status === "success"
-                ? "linear-gradient(180deg, rgba(201,179,217,0.14) 0%, rgba(47,18,61,0.2) 46%, rgba(27,10,36,0.25) 100%)"
-                : "linear-gradient(180deg, rgba(47,18,61,0.5) 46%, rgba(17,12,20,0.55) 92%, rgba(27,10,36,0.6) 100%)",
+                ? "linear-gradient(180deg, rgba(167,139,250,0.12) 0%, rgba(12,9,18,0.9) 55%, rgba(6,5,9,0.95) 100%)"
+                : "linear-gradient(180deg, rgba(20,10,28,0.6) 0%, rgba(8,6,11,0.95) 100%)",
           }}
         >
           {message}

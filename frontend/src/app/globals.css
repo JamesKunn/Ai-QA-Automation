@@ -1,19 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #2f123d;
-  --foreground: #ece6f0;
-  --foreground-muted: #a89bb5;
-  --portal-start: rgb(47, 18, 61);
-  --portal-dark: rgb(17, 12, 20);
-  --portal-end: rgb(27, 10, 36);
-  --accent: #c9b3d9;
-  --accent-bright: #dcc9eb;
+  --background: #060508;
+  --foreground: #f0ecf4;
+  --foreground-muted: #8f8798;
+  --portal-void: rgb(4, 3, 6);
+  --portal-dark: rgb(8, 6, 11);
+  --portal-mid: rgb(12, 9, 16);
+  --portal-accent: rgb(28, 14, 38);
+  --accent: #c4b5fd;
+  --accent-bright: #ddd6fe;
+  --accent-vivid: #a78bfa;
+  --accent-deep: #7c3aed;
   --gradient-vertical: linear-gradient(
     180deg,
-    rgba(47, 18, 61, 1) 46%,
-    rgba(17, 12, 20, 1) 92%,
-    rgba(27, 10, 36, 1) 100%
+    rgba(8, 6, 11, 1) 0%,
+    rgba(4, 3, 6, 1) 42%,
+    rgba(6, 5, 9, 1) 78%,
+    rgba(14, 8, 20, 0.85) 100%
   );
 }
 
@@ -43,11 +47,11 @@ body::before {
   background-image:
     repeating-linear-gradient(
       180deg,
-      rgba(201, 179, 217, 0.02),
-      rgba(201, 179, 217, 0.02) 1px,
+      rgba(167, 139, 250, 0.015),
+      rgba(167, 139, 250, 0.015) 1px,
       transparent 1px,
       transparent 4px
     );
-  opacity: 0.08;
+  opacity: 0.06;
   mix-blend-mode: overlay;
 }

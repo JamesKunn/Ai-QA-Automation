@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ACCEPT_ATTRIBUTE,
   ACCEPTED_EXTENSIONS,
@@ -43,6 +44,7 @@ function validateFile(file: File): string | undefined {
 }
 
 export default function FileUpload() {
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState<SelectedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -124,13 +126,27 @@ export default function FileUpload() {
       }
 
       setStatus("success");
-      const displayMessage = data.n8nStatus
-        ? `${data.message} | ${data.n8nStatus}`
-        : data.message;
-      setMessage(displayMessage);
-
+      setMessage(data.message ?? "Upload complete.");
       setSelected([]);
       if (inputRef.current) inputRef.current.value = "";
+
+      // Stash the n8n result for /review to consume, then navigate.
+      // sessionStorage scopes per-tab so concurrent users don't see each other.
+      if (data.n8nData) {
+        try {
+          sessionStorage.setItem(
+            "qa.review.payload",
+            JSON.stringify({
+              uploadedAt: new Date().toISOString(),
+              files: data.files ?? [],
+              n8nData: data.n8nData,
+            }),
+          );
+          router.push("/review");
+        } catch (err) {
+          console.error("Failed to stash review payload:", err);
+        }
+      }
     } catch {
       setStatus("error");
       setMessage("Network error. Please try again.");

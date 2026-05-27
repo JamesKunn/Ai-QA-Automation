@@ -50,6 +50,7 @@ export async function POST(request: Request) {
 
     const n8nUrl = process.env.N8N_WEBHOOK_URL;
     let n8nStatus = "n8n integration inactive (N8N_WEBHOOK_URL is not set)";
+    let n8nData: unknown = null;
 
     if (n8nUrl) {
       try {
@@ -63,6 +64,16 @@ export async function POST(request: Request) {
           body: n8nFormData,
         });
 
+        // Try to parse JSON response from n8n's "Respond to Webhook" node.
+        // Fall back to text so we never throw on unexpected payloads.
+        const responseContentType = response.headers.get("content-type") ?? "";
+        if (responseContentType.includes("application/json")) {
+          n8nData = await response.json();
+        } else {
+          const text = await response.text();
+          n8nData = text ? { raw: text } : null;
+        }
+
         n8nStatus = response.ok
           ? `Success: Forwarded to n8n (${response.status})`
           : `Failed: n8n returned status ${response.status}`;
@@ -75,6 +86,7 @@ export async function POST(request: Request) {
       message: `Successfully uploaded ${accepted.length} file(s).`,
       files: accepted.map((f) => ({ name: f.name, size: f.size })),
       n8nStatus,
+      n8nData,
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error: any) {

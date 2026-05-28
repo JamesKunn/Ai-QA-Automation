@@ -358,7 +358,7 @@ export default function FileUpload() {
                   : "0 0 0 1px rgba(167,139,250,0.15) inset, 0 8px 28px rgba(0,0,0,0.45)",
           }}
         >
-          {status === "uploading" ? "Uploading…" : "Upload files"}
+          {status === "uploading" ? "Generating…" : "Upload files"}
         </button>
 
         <p className="text-xs text-[#8f8798]">
@@ -366,7 +366,25 @@ export default function FileUpload() {
         </p>
       </div>
 
-      {message && (
+      {status === "uploading" && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-4 flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#f0ecf4] ring-1 ring-[#a78bfa]/35 backdrop-blur-xl"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(167,139,250,0.12) 0%, rgba(12,9,18,0.9) 55%, rgba(6,5,9,0.95) 100%)",
+          }}
+        >
+          <Spinner />
+          <span>
+            Generating your QA results… this may take a moment, please don’t
+            close this tab.
+          </span>
+        </div>
+      )}
+
+      {message && status !== "uploading" && (
         <p
           role="status"
           className={`mt-4 rounded-xl px-4 py-3 text-sm backdrop-blur-xl ${
@@ -385,6 +403,32 @@ export default function FileUpload() {
         </p>
       )}
     </div>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg
+      className="h-5 w-5 shrink-0 animate-spin text-[#c4b5fd]"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-90"
+        fill="currentColor"
+        d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"
+      />
+    </svg>
   );
 }
 

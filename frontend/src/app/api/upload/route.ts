@@ -63,6 +63,11 @@ export async function POST(request: Request) {
           n8nFormData.append("numberOfEpics", numberOfEpics.trim());
         }
 
+        console.log("[upload] forwarding to n8n:", {
+          fileCount: accepted.length,
+          numberOfEpics,
+        });
+
         const response = await fetch(n8nUrl, {
           method: "POST",
           body: n8nFormData,

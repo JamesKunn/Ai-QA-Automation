@@ -1,24 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #060508;
-  --foreground: #f0ecf4;
-  --foreground-muted: #8f8798;
-  --portal-void: rgb(4, 3, 6);
-  --portal-dark: rgb(8, 6, 11);
-  --portal-mid: rgb(12, 9, 16);
-  --portal-accent: rgb(28, 14, 38);
-  --accent: #c4b5fd;
-  --accent-bright: #ddd6fe;
-  --accent-vivid: #a78bfa;
-  --accent-deep: #7c3aed;
-  --gradient-vertical: linear-gradient(
-    180deg,
-    rgba(8, 6, 11, 1) 0%,
-    rgba(4, 3, 6, 1) 42%,
-    rgba(6, 5, 9, 1) 78%,
-    rgba(14, 8, 20, 0.85) 100%
-  );
+  --background: #ffffff;
+  --foreground: #09090b;
+  --foreground-muted: #71717a;
+  --accent: #8b5cf6;
+  --accent-bright: #7c3aed;
 }
 
 @theme inline {
@@ -32,11 +19,32 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  min-height: 100%;
-  background-image: var(--gradient-vertical);
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-size: cover;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image: radial-gradient(rgba(9, 9, 11, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1000px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.02) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 @keyframes qa-shimmer {
@@ -60,21 +68,4 @@ body {
   background-clip: text;
   color: transparent;
   animation: qa-shimmer 2.4s linear infinite;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    repeating-linear-gradient(
-      180deg,
-      rgba(167, 139, 250, 0.015),
-      rgba(167, 139, 250, 0.015) 1px,
-      transparent 1px,
-      transparent 4px
-    );
-  opacity: 0.06;
-  mix-blend-mode: overlay;
 }

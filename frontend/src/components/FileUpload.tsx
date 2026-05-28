@@ -50,6 +50,7 @@ export default function FileUpload() {
   const [isDragging, setIsDragging] = useState(false);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [message, setMessage] = useState<string | null>(null);
+  const [epicCount, setEpicCount] = useState("");
 
   useEffect(() => {
     if (!message || status === "uploading" || status === "idle") return;
@@ -110,6 +111,9 @@ export default function FileUpload() {
     const formData = new FormData();
     for (const { file } of validFiles) {
       formData.append("files", file);
+    }
+    if (epicCount.trim()) {
+      formData.append("numberOfEpics", epicCount.trim());
     }
 
     try {
@@ -301,6 +305,31 @@ export default function FileUpload() {
           </ul>
         </div>
       )}
+
+      <div className="mt-6">
+        <label
+          htmlFor="epic-count"
+          className="mb-2 block text-sm font-medium text-[#c4b5fd]"
+        >
+          Number of epics{" "}
+          <span className="text-[#8f8798]">(optional)</span>
+        </label>
+        <input
+          id="epic-count"
+          type="number"
+          min={1}
+          step={1}
+          inputMode="numeric"
+          value={epicCount}
+          onChange={(e) => setEpicCount(e.target.value)}
+          placeholder="e.g. 5"
+          className="w-full max-w-[12rem] rounded-xl border px-3 py-2 text-sm text-[#f0ecf4] outline-none transition-colors placeholder:text-[#8f8798] focus:border-[#c4b5fd]/50"
+          style={{
+            background: "rgba(8,6,11,0.6)",
+            borderColor: "rgba(167,139,250,0.22)",
+          }}
+        />
+      </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
         <button

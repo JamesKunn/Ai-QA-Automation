@@ -11,6 +11,7 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const entries = formData.getAll("files");
+    const numberOfEpics = formData.get("numberOfEpics");
 
     if (entries.length === 0) {
       return NextResponse.json(
@@ -57,6 +58,9 @@ export async function POST(request: Request) {
         const n8nFormData = new FormData();
         for (const file of accepted) {
           n8nFormData.append("files", file, file.name);
+        }
+        if (typeof numberOfEpics === "string" && numberOfEpics.trim()) {
+          n8nFormData.append("numberOfEpics", numberOfEpics.trim());
         }
 
         const response = await fetch(n8nUrl, {

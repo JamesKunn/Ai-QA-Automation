@@ -130,8 +130,18 @@ export default function FileUpload() {
       setSelected([]);
       if (inputRef.current) inputRef.current.value = "";
 
+      // Always clear any prior review state first, so a previous upload's
+      // output can never linger on /review when this upload has no data or
+      // fails to persist. sessionStorage scopes per-tab so concurrent users
+      // don't see each other.
+      try {
+        sessionStorage.removeItem("qa.review.edits");
+        sessionStorage.removeItem("qa.review.payload");
+      } catch {
+        /* storage disabled — nothing to clear */
+      }
+
       // Stash the n8n result for /review to consume, then navigate.
-      // sessionStorage scopes per-tab so concurrent users don't see each other.
       if (data.n8nData) {
         try {
           sessionStorage.setItem(
@@ -145,6 +155,10 @@ export default function FileUpload() {
           router.push("/review");
         } catch (err) {
           console.error("Failed to stash review payload:", err);
+          setStatus("error");
+          setMessage(
+            "Upload succeeded, but the result was too large to open in the review page.",
+          );
         }
       }
     } catch {

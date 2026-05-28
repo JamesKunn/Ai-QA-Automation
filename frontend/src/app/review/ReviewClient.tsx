@@ -143,7 +143,9 @@ export default function ReviewClient() {
   const [hydrated, setHydrated] = useState(false);
   const [query, setQuery] = useState("");
 
-  // Hydrate from sessionStorage: prefer edits (so refresh keeps work).
+  // Hydrate from sessionStorage. Edits are stamped with the upload's
+  // `uploadedAt`; we only restore them if that stamp matches the current
+  // payload — otherwise stale edits from a previous upload are discarded.
   useEffect(() => {
     try {
       const rawPayload = sessionStorage.getItem(PAYLOAD_KEY);
@@ -153,17 +155,27 @@ export default function ReviewClient() {
         const original = extractRows(parsed.n8nData);
         setOriginalRows(original);
 
+        let restored = original;
         const rawEdits = sessionStorage.getItem(EDITS_KEY);
         if (rawEdits) {
           try {
-            const edited = JSON.parse(rawEdits) as Row[];
-            setRows(Array.isArray(edited) ? edited : original);
+            const saved = JSON.parse(rawEdits) as {
+              uploadedAt?: string;
+              rows?: Row[];
+            };
+            if (
+              saved.uploadedAt === parsed.uploadedAt &&
+              Array.isArray(saved.rows)
+            ) {
+              restored = saved.rows;
+            } else {
+              sessionStorage.removeItem(EDITS_KEY); // stale — drop it
+            }
           } catch {
-            setRows(original);
+            sessionStorage.removeItem(EDITS_KEY);
           }
-        } else {
-          setRows(original);
         }
+        setRows(restored);
       }
     } catch (err) {
       console.error("Failed to read review payload:", err);
@@ -173,14 +185,18 @@ export default function ReviewClient() {
   }, []);
 
   // Persist edits on every change (skip the initial empty render).
+  // Stamp with the upload's `uploadedAt` so they can't bind to another upload.
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || !payload) return;
     try {
-      sessionStorage.setItem(EDITS_KEY, JSON.stringify(rows));
+      sessionStorage.setItem(
+        EDITS_KEY,
+        JSON.stringify({ uploadedAt: payload.uploadedAt, rows }),
+      );
     } catch {
       /* quota or disabled — silently ignore */
     }
-  }, [rows, hydrated]);
+  }, [rows, hydrated, payload]);
 
   const columns = useMemo(() => deriveColumns(rows), [rows]);
   const columnPlan = useMemo(() => planColumns(columns), [columns]);

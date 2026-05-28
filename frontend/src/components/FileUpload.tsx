@@ -239,7 +239,7 @@ export default function FileUpload() {
         </p>
 
         <p className="mt-1.5 text-xs text-[#71717a]">
-          CSV, PDF, and DOCX only — up to {MAX_FILE_SIZE_LABEL} each
+          PDF only — up to {MAX_FILE_SIZE_LABEL} each
         </p>
       </div>
 

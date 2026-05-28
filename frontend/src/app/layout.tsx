@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Ai-QA-Automation File Portal",
-  description: "Upload CSV, PDF, and DOCX files for QA automation processing",
+  description: "Upload PDF files for QA automation processing",
 };
 
 export default function RootLayout({

@@ -1,14 +1,11 @@
-export const ACCEPTED_EXTENSIONS = [".csv", ".pdf", ".docx"] as const;
+export const ACCEPTED_EXTENSIONS = [".pdf"] as const;
 
 export const ACCEPTED_MIME_TYPES = [
-  "text/csv",
-  "application/csv",
   "application/pdf",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ] as const;
 
-export const MAX_FILE_SIZE_BYTES = 1024 * 1024 * 1024; // 1 GB
-export const MAX_FILE_SIZE_LABEL = "1 GB";
+export const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
+export const MAX_FILE_SIZE_LABEL = "25 MB";
 
 export const ACCEPT_ATTRIBUTE = ACCEPTED_EXTENSIONS.join(",");
 

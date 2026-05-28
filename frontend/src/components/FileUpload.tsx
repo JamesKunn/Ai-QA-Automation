@@ -15,6 +15,17 @@ type UploadStatus = "idle" | "uploading" | "success" | "error";
 
 const NOTIFICATION_AUTO_CLOSE_MS = 5000;
 
+const GENERATING_PHRASES = [
+  "Generating",
+  "Reading the document",
+  "Identifying epics",
+  "Grouping related features",
+  "Structuring results",
+  "Finalizing",
+];
+
+const PHRASE_INTERVAL_MS = 2200;
+
 const SURFACE_GRADIENT =
   "linear-gradient(180deg, rgba(16,13,22,0.95) 0%, rgba(8,6,11,0.98) 55%, rgba(10,8,14,0.98) 100%)";
 
@@ -51,6 +62,18 @@ export default function FileUpload() {
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [epicCount, setEpicCount] = useState("");
+  const [phraseIdx, setPhraseIdx] = useState(0);
+
+  useEffect(() => {
+    if (status !== "uploading") {
+      setPhraseIdx(0);
+      return;
+    }
+    const id = setInterval(() => {
+      setPhraseIdx((i) => (i + 1) % GENERATING_PHRASES.length);
+    }, PHRASE_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [status]);
 
   useEffect(() => {
     if (!message || status === "uploading" || status === "idle") return;
@@ -377,10 +400,14 @@ export default function FileUpload() {
           }}
         >
           <Spinner />
-          <span>
-            Generating your QA results… this may take a moment, please don’t
-            close this tab.
-          </span>
+          <div className="min-w-0">
+            <span className="qa-shimmer-text text-sm font-medium">
+              {GENERATING_PHRASES[phraseIdx]}…
+            </span>
+            <p className="mt-0.5 text-xs text-[#8f8798]">
+              This may take a moment — please don’t close this tab.
+            </p>
+          </div>
         </div>
       )}
 

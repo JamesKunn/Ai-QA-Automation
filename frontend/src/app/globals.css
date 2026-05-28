@@ -39,6 +39,29 @@ body {
   background-size: cover;
 }
 
+@keyframes qa-shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.qa-shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--foreground-muted) 0%,
+    var(--accent-bright) 50%,
+    var(--foreground-muted) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: qa-shimmer 2.4s linear infinite;
+}
+
 body::before {
   content: "";
   position: fixed;

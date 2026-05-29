@@ -4,10 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import * as XLSX from "xlsx";
 
-const SURFACE_GRADIENT =
-  "linear-gradient(180deg, rgba(16,13,22,0.95) 0%, rgba(8,6,11,0.98) 55%, rgba(10,8,14,0.98) 100%)";
-const BUTTON_PRIMARY =
-  "linear-gradient(180deg, #ddd6fe 0%, #c4b5fd 40%, #a78bfa 100%)";
+const SURFACE_GRADIENT = "#ffffff";
+const BUTTON_PRIMARY = "#8b5cf6";
 
 const PAYLOAD_KEY = "qa.review.payload";
 const EDITS_KEY = "qa.review.edits";
@@ -89,12 +87,12 @@ function toCellString(v: unknown): string {
 function statusTone(value: string): { dot: string; text: string; bg: string } {
   const v = value.trim().toLowerCase();
   if (["valid", "success", "ok", "passed", "pass", "done"].includes(v))
-    return { dot: "#86efac", text: "#bbf7d0", bg: "rgba(34,197,94,0.12)" };
+    return { dot: "#22c55e", text: "#15803d", bg: "rgba(34,197,94,0.1)" };
   if (["invalid", "error", "fail", "failed", "rejected"].includes(v))
-    return { dot: "#fca5a5", text: "#fecaca", bg: "rgba(239,68,68,0.12)" };
+    return { dot: "#ef4444", text: "#b91c1c", bg: "rgba(239,68,68,0.1)" };
   if (["pending", "processing", "in_progress", "review"].includes(v))
-    return { dot: "#fcd34d", text: "#fef3c7", bg: "rgba(245,158,11,0.12)" };
-  return { dot: "#c4b5fd", text: "#ddd6fe", bg: "rgba(167,139,250,0.12)" };
+    return { dot: "#f59e0b", text: "#b45309", bg: "rgba(245,158,11,0.1)" };
+  return { dot: "#8b5cf6", text: "#6d28d9", bg: "rgba(139,92,246,0.1)" };
 }
 
 /** Auto-growing textarea: resizes to fit content, no resize handle. */
@@ -126,10 +124,10 @@ function AutoTextarea(props: {
       }}
       rows={1}
       aria-label={props.ariaLabel}
-      className="w-full resize-none overflow-hidden bg-transparent px-3 py-2 text-sm leading-relaxed text-[#f0ecf4] outline-none transition-colors focus:bg-[rgba(167,139,250,0.06)]"
+      className="w-full resize-none overflow-hidden bg-transparent px-3 py-2 text-sm leading-relaxed text-[#09090b] outline-none transition-colors focus:bg-[rgba(139,92,246,0.03)]"
       style={{
         boxShadow: props.edited
-          ? "inset 2px 0 0 rgba(196,181,253,0.55)"
+          ? "inset 2px 0 0 rgba(139,92,246,0.55)"
           : undefined,
       }}
     />
@@ -289,39 +287,28 @@ export default function ReviewClient() {
 
   if (!payload || rows.length === 0) {
     return (
-      <div
-        className="rounded-2xl border px-6 py-12 text-center"
-        style={{
-          borderColor: "rgba(167, 139, 250, 0.22)",
-          background: SURFACE_GRADIENT,
-        }}
-      >
-        <p className="text-base font-medium text-[#f0ecf4]">
+      <div className="rounded-lg border border-[#e4e4e7] bg-[#ffffff] px-6 py-12 text-center shadow-sm">
+        <p className="text-base font-medium text-[#09090b]">
           No review data available.
         </p>
-        <p className="mt-2 text-sm text-[#8f8798]">
+        <p className="mt-2 text-sm text-[#71717a]">
           {payload
             ? "The processing response didn't include any rows we could display."
             : "Upload a file first to see results here."}
         </p>
         {payload?.n8nData != null && (
-          <details className="mx-auto mt-6 max-w-xl text-left text-xs text-[#8f8798]">
-            <summary className="cursor-pointer text-[#c4b5fd] hover:text-[#ddd6fe]">
+          <details className="mx-auto mt-6 max-w-xl text-left text-xs text-[#71717a]">
+            <summary className="cursor-pointer text-[#8b5cf6] hover:text-[#7c3aed]">
               Show raw response
             </summary>
-            <pre className="mt-3 overflow-auto rounded-lg bg-black/40 p-3 text-[11px] leading-relaxed">
+            <pre className="mt-3 overflow-auto rounded-md bg-[#f4f4f5] p-3 text-[11px] leading-relaxed border border-[#e4e4e7] text-[#09090b]">
               {JSON.stringify(payload.n8nData, null, 2)}
             </pre>
           </details>
         )}
         <Link
           href="/"
-          className="mt-6 inline-flex h-10 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
-          style={{
-            border: "1px solid rgba(221,214,254,0.5)",
-            color: "#1a0f2e",
-            background: BUTTON_PRIMARY,
-          }}
+          className="mt-6 inline-flex h-10 items-center justify-center rounded-md px-5 text-sm font-semibold border border-[#8b5cf6] bg-[#8b5cf6] text-white transition-colors hover:bg-[#7c3aed]"
         >
           Back to upload
         </Link>
@@ -335,8 +322,8 @@ export default function ReviewClient() {
     <div>
       {/* Metadata strip */}
       {payload.files && payload.files.length > 0 && (
-        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#8f8798]">
-          <span className="truncate text-[#c4b5fd]">
+        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#71717a]">
+          <span className="truncate text-[#8b5cf6] font-medium">
             {payload.files.map((f) => f.name).join(", ")}
           </span>
           <span className="opacity-50">•</span>
@@ -348,7 +335,7 @@ export default function ReviewClient() {
           {editedCount > 0 && (
             <>
               <span className="opacity-50">•</span>
-              <span className="text-[#ddd6fe]">
+              <span className="text-[#7c3aed] font-medium">
                 {editedCount} unsaved edit{editedCount !== 1 ? "s" : ""}
               </span>
             </>
@@ -357,29 +344,18 @@ export default function ReviewClient() {
       )}
 
       {/* Search bar */}
-      <div className="mb-3">
+      <div className="mb-4">
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Filter rows…"
-          className="w-full max-w-sm rounded-xl border px-3 py-2 text-sm text-[#f0ecf4] outline-none transition-colors placeholder:text-[#8f8798] focus:border-[#c4b5fd]/50"
-          style={{
-            background: "rgba(8,6,11,0.6)",
-            borderColor: "rgba(167,139,250,0.22)",
-          }}
+          className="w-full max-w-sm rounded-md border border-[#d4d4d8] bg-[#ffffff] px-3 py-2 text-sm text-[#09090b] outline-none transition-all placeholder:text-[#a1a1aa] focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6]"
         />
       </div>
 
       {/* Table */}
-      <div
-        className="overflow-hidden rounded-2xl border"
-        style={{
-          borderColor: "rgba(167, 139, 250, 0.22)",
-          background: SURFACE_GRADIENT,
-          boxShadow: "0 0 0 1px rgba(167,139,250,0.08) inset",
-        }}
-      >
+      <div className="overflow-hidden rounded-lg border border-[#e4e4e7] bg-[#ffffff] shadow-sm">
         <div className="max-h-[65vh] overflow-auto">
           <table className="w-full border-collapse text-sm">
             <colgroup>
@@ -390,21 +366,14 @@ export default function ReviewClient() {
               <col style={{ width: "2.5rem" }} />
             </colgroup>
             <thead className="sticky top-0 z-10">
-              <tr
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(20,16,28,0.98) 0%, rgba(16,12,22,0.98) 100%)",
-                  borderBottom: "1px solid rgba(167,139,250,0.22)",
-                  boxShadow: "0 1px 0 rgba(167,139,250,0.05)",
-                }}
-              >
-                <th className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-[#8f8798]">
+              <tr className="border-b border-[#e4e4e7] bg-[#f4f4f5]">
+                <th className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-[#71717a]">
                   #
                 </th>
                 {columns.map((c) => (
                   <th
                     key={c}
-                    className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-[#c4b5fd]"
+                    className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-[#8b5cf6]"
                   >
                     {c}
                   </th>
@@ -419,15 +388,15 @@ export default function ReviewClient() {
                 return (
                   <tr
                     key={ri}
-                    className="group transition-colors hover:bg-[rgba(167,139,250,0.05)]"
+                    className="group transition-colors hover:bg-[#f4f4f5]"
                     style={{
                       background: zebra
-                        ? "rgba(167,139,250,0.025)"
+                        ? "rgba(244, 244, 245, 0.5)"
                         : "transparent",
-                      borderBottom: "1px solid rgba(167,139,250,0.06)",
+                      borderBottom: "1px solid #e4e4e7",
                     }}
                   >
-                    <td className="px-3 py-2 align-top text-xs text-[#8f8798] tabular-nums">
+                    <td className="px-3 py-2 align-top text-xs text-[#71717a] tabular-nums">
                       {ri + 1}
                     </td>
                     {columns.map((c, ci) => {
@@ -453,7 +422,7 @@ export default function ReviewClient() {
                               <input
                                 value={cellValue}
                                 onChange={(e) => updateCell(ri, c, e.target.value)}
-                                className="w-0 flex-1 bg-transparent text-xs text-transparent outline-none focus:text-[#f0ecf4]"
+                                className="w-0 flex-1 bg-transparent text-xs text-transparent outline-none focus:text-[#09090b]"
                                 aria-label={`Edit status for row ${ri + 1}`}
                               />
                             </div>
@@ -476,7 +445,7 @@ export default function ReviewClient() {
                       <button
                         type="button"
                         onClick={() => removeRow(ri)}
-                        className="opacity-0 transition-opacity group-hover:opacity-100 rounded-md px-2 py-1 text-xs text-[#8f8798] hover:bg-[rgba(232,168,200,0.1)] hover:text-[#f0a8c8]"
+                        className="opacity-0 transition-opacity group-hover:opacity-100 rounded-md px-2 py-1 text-xs text-[#71717a] hover:bg-[#fee2e2] hover:text-[#ef4444]"
                         aria-label={`Remove row ${ri + 1}`}
                         title="Remove row"
                       >
@@ -490,7 +459,7 @@ export default function ReviewClient() {
                 <tr>
                   <td
                     colSpan={columns.length + 2}
-                    className="px-3 py-8 text-center text-sm text-[#8f8798]"
+                    className="px-3 py-8 text-center text-sm text-[#71717a]"
                   >
                     No rows match “{query}”.
                   </td>
@@ -506,16 +475,14 @@ export default function ReviewClient() {
         <div className="flex flex-wrap gap-2">
           <Link
             href="/"
-            className="inline-flex h-10 items-center justify-center rounded-2xl border px-4 text-sm font-semibold text-[#c4b5fd] transition-colors hover:text-[#ddd6fe]"
-            style={{ borderColor: "rgba(167,139,250,0.35)" }}
+            className="inline-flex h-10 items-center justify-center rounded-md border border-[#e4e4e7] bg-[#ffffff] text-[#09090b] hover:bg-[#f4f4f5] px-4 text-sm font-medium transition-colors"
           >
             ← Back
           </Link>
           <button
             type="button"
             onClick={addRow}
-            className="inline-flex h-10 items-center justify-center rounded-2xl border px-4 text-sm font-semibold text-[#c4b5fd] transition-colors hover:text-[#ddd6fe]"
-            style={{ borderColor: "rgba(167,139,250,0.35)" }}
+            className="inline-flex h-10 items-center justify-center rounded-md border border-[#e4e4e7] bg-[#ffffff] text-[#09090b] hover:bg-[#f4f4f5] px-4 text-sm font-medium transition-colors"
           >
             + Add row
           </button>
@@ -523,8 +490,7 @@ export default function ReviewClient() {
             <button
               type="button"
               onClick={resetAll}
-              className="inline-flex h-10 items-center justify-center rounded-2xl border px-4 text-sm font-semibold text-[#8f8798] transition-colors hover:text-[#f0a8c8]"
-              style={{ borderColor: "rgba(167,139,250,0.18)" }}
+              className="inline-flex h-10 items-center justify-center rounded-md border border-[#fca5a5] bg-[#ffffff] text-[#ef4444] hover:bg-[#fee2e2] px-4 text-sm font-medium transition-colors"
               title="Discard all edits and restore the original data"
             >
               Reset
@@ -535,14 +501,7 @@ export default function ReviewClient() {
         <button
           type="button"
           onClick={downloadXlsx}
-          className="inline-flex h-11 items-center justify-center rounded-2xl px-6 text-sm font-semibold transition-[transform,box-shadow,filter] hover:translate-y-[-1px] hover:brightness-110"
-          style={{
-            border: "1px solid rgba(221,214,254,0.5)",
-            color: "#1a0f2e",
-            background: BUTTON_PRIMARY,
-            boxShadow:
-              "0 0 0 1px rgba(255,255,255,0.2) inset, 0 12px 36px rgba(0,0,0,0.5), 0 0 32px rgba(124,58,237,0.45)",
-          }}
+          className="inline-flex h-10 items-center justify-center rounded-md bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-5 text-sm font-medium transition-colors border border-[#8b5cf6]"
         >
           Download as Excel
         </button>

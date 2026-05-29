@@ -26,14 +26,12 @@ const GENERATING_PHRASES = [
 
 const PHRASE_INTERVAL_MS = 2200;
 
-const SURFACE_GRADIENT =
-  "linear-gradient(180deg, rgba(16,13,22,0.95) 0%, rgba(8,6,11,0.98) 55%, rgba(10,8,14,0.98) 100%)";
+const SURFACE_GRADIENT = "#ffffff";
 
-const BUTTON_PRIMARY =
-  "linear-gradient(180deg, #ddd6fe 0%, #c4b5fd 40%, #a78bfa 100%)";
+const BUTTON_PRIMARY = "#8b5cf6";
+const BUTTON_PRIMARY_HOVER = "#7c3aed";
 
-const BUTTON_DISABLED =
-  "linear-gradient(180deg, rgba(16,13,22,0.95) 0%, rgba(8,6,11,0.98) 100%)";
+const BUTTON_DISABLED = "#f4f4f5";
 
 type SelectedFile = {
   id: string;
@@ -217,30 +215,12 @@ export default function FileUpload() {
           if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
         }}
         onClick={() => inputRef.current?.click()}
-        className={`group relative cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed px-8 py-14 text-center transition-[border-color,background-color] ${
+        className={`group relative cursor-pointer overflow-hidden rounded-lg border border-dashed px-8 py-12 text-center transition-colors ${
           isDragging
-            ? "border-[#c4b5fd]/70"
-            : "border-[#a78bfa]/30 hover:border-[#c4b5fd]/50"
+            ? "border-[#8b5cf6] bg-[#f4f4f5]"
+            : "border-[#d4d4d8] bg-[#ffffff] hover:border-[#a1a1aa] hover:bg-[#fafafa]"
         }`}
-        style={{
-          background: isDragging
-            ? "linear-gradient(180deg, rgba(167,139,250,0.1) 0%, rgba(12,9,18,0.95) 55%, rgba(6,5,9,0.98) 100%)"
-            : SURFACE_GRADIENT,
-          boxShadow:
-            "0 0 0 1px rgba(167,139,250,0.12) inset, 0 8px 32px rgba(0,0,0,0.55)",
-        }}
       >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-3xl"
-          style={{
-            backgroundImage:
-              "linear-gradient(180deg, rgba(167,139,250,0.06) 0%, transparent 46%, rgba(4,3,6,0.2) 100%), linear-gradient(rgba(167,139,250,0.04) 1px, transparent 1px)",
-            backgroundSize: "auto, 28px 28px",
-            opacity: isDragging ? 0.95 : 0.75,
-          }}
-        />
-
         <input
           ref={inputRef}
           type="file"
@@ -251,74 +231,54 @@ export default function FileUpload() {
             if (e.target.files?.length) addFiles(e.target.files);
           }}
         />
-        <div
-          className="relative mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full text-[#c4b5fd]"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(167,139,250,0.18) 0%, rgba(12,9,18,0.9) 55%, rgba(6,5,9,0.95) 100%)",
-            boxShadow:
-              "0 0 0 1px rgba(167,139,250,0.2) inset, 0 0 24px rgba(124,58,237,0.2)",
-          }}
-        >
-          <div className="relative">
-            <UploadIcon />
-          </div>
+        <div className="relative mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-md border border-[#e4e4e7] bg-[#f4f4f5] text-[#8b5cf6]">
+          <UploadIcon />
         </div>
-        <p className="relative text-lg font-semibold text-[#f0ecf4] drop-shadow-[0_0_12px_rgba(167,139,250,0.12)]">
-          Drop files here or click to browse
+        <p className="text-sm font-medium text-[#09090b]">
+          Drag & drop files here, or click to browse
         </p>
 
-        <p className="relative mt-2 text-sm text-[#8f8798]">
-          CSV, PDF, and DOCX only — up to {MAX_FILE_SIZE_LABEL} each
+        <p className="mt-1.5 text-xs text-[#71717a]">
+          PDF only — up to {MAX_FILE_SIZE_LABEL} each
         </p>
       </div>
 
       {selected.length > 0 && (
-        <div
-          className="mt-6 overflow-hidden rounded-2xl border backdrop-blur-xl"
-          style={{
-            borderColor: "rgba(167, 139, 250, 0.22)",
-            background: SURFACE_GRADIENT,
-            boxShadow: "0 0 0 1px rgba(167,139,250,0.08) inset",
-          }}
-        >
-          <div
-            className="flex items-center justify-between border-b px-4 py-3"
-            style={{ borderColor: "rgba(167, 139, 250, 0.1)" }}
-          >
-            <span className="text-sm font-medium text-[#c4b5fd]">
+        <div className="mt-6 overflow-hidden rounded-lg border border-[#e4e4e7] bg-[#ffffff]">
+          <div className="flex items-center justify-between border-b border-[#e4e4e7] px-4 py-2.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#8b5cf6]">
               {selected.length} file{selected.length !== 1 ? "s" : ""} selected
             </span>
             <button
               type="button"
               onClick={clearAll}
-              className="text-sm text-[#8f8798] transition-colors hover:text-[#ddd6fe]"
+              className="text-xs text-[#71717a] transition-colors hover:text-[#7c3aed]"
             >
               Clear all
             </button>
           </div>
 
-          <ul className="divide-y divide-[rgba(167,139,250,0.08)]">
+          <ul className="divide-y divide-[#e4e4e7]">
             {selected.map(({ id, file, error }) => (
               <li
                 key={id}
-                className="flex items-center justify-between gap-3 px-4 py-3"
+                className="flex items-center justify-between gap-3 px-4 py-2.5"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-[#f0ecf4]">
+                  <p className="truncate text-sm font-medium text-[#09090b]">
                     {file.name}
                   </p>
-                  <p className="text-xs text-[#8f8798]">
+                  <p className="text-xs text-[#71717a]">
                     {formatFileSize(file.size)}
                     {error && (
-                      <span className="ml-2 text-[#e8a8c8]">— {error}</span>
+                      <span className="ml-2 text-[#ef4444]">— {error}</span>
                     )}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => removeFile(id)}
-                  className="shrink-0 rounded-lg px-2 py-1 text-xs text-[#c4b5fd] transition-colors hover:bg-[rgba(167,139,250,0.12)] hover:text-[#f0ecf4]"
+                  className="shrink-0 rounded-md border border-[#e4e4e7] bg-[#ffffff] px-2.5 py-1 text-xs text-[#ef4444] transition-colors hover:bg-[#fee2e2] hover:border-[#fca5a5] hover:text-[#ef4444]"
                   aria-label={`Remove ${file.name}`}
                 >
                   Remove
@@ -332,10 +292,9 @@ export default function FileUpload() {
       <div className="mt-6">
         <label
           htmlFor="epic-count"
-          className="mb-2 block text-sm font-medium text-[#c4b5fd]"
+          className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#71717a]"
         >
-          Number of epics{" "}
-          <span className="text-[#8f8798]">(optional)</span>
+          Number of epics <span className="lowercase text-[#a1a1aa]">(optional)</span>
         </label>
         <input
           id="epic-count"
@@ -346,11 +305,7 @@ export default function FileUpload() {
           value={epicCount}
           onChange={(e) => setEpicCount(e.target.value)}
           placeholder="e.g. 5"
-          className="w-full max-w-[12rem] rounded-xl border px-3 py-2 text-sm text-[#f0ecf4] outline-none transition-colors placeholder:text-[#8f8798] focus:border-[#c4b5fd]/50"
-          style={{
-            background: "rgba(8,6,11,0.6)",
-            borderColor: "rgba(167,139,250,0.22)",
-          }}
+          className="w-full max-w-[12rem] rounded-md border border-[#d4d4d8] bg-[#ffffff] px-3 py-2 text-sm text-[#09090b] outline-none transition-all placeholder:text-[#a1a1aa] focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6]"
         />
       </div>
 
@@ -359,32 +314,16 @@ export default function FileUpload() {
           type="button"
           onClick={handleUpload}
           disabled={status === "uploading" || validFiles.length === 0}
-          className="inline-flex h-12 items-center justify-center rounded-3xl px-8 text-sm font-semibold transition-[transform,box-shadow,background-color,border-color,filter] hover:translate-y-[-1px] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-55"
-          style={{
-            border:
-              validFiles.length > 0 && status !== "uploading"
-                ? "1px solid rgba(221,214,254,0.5)"
-                : "1px solid rgba(167,139,250,0.35)",
-            color:
-              validFiles.length > 0 && status !== "uploading"
-                ? "#1a0f2e"
-                : "#c4b5fd",
-            background:
-              validFiles.length > 0 && status !== "uploading"
-                ? BUTTON_PRIMARY
-                : BUTTON_DISABLED,
-            boxShadow:
-              status === "uploading"
-                ? "0 0 0 1px rgba(167,139,250,0.25) inset, 0 8px 28px rgba(0,0,0,0.5), 0 0 20px rgba(124,58,237,0.25)"
-                : validFiles.length > 0
-                  ? "0 0 0 1px rgba(255,255,255,0.2) inset, 0 12px 36px rgba(0,0,0,0.5), 0 0 32px rgba(124,58,237,0.45)"
-                  : "0 0 0 1px rgba(167,139,250,0.15) inset, 0 8px 28px rgba(0,0,0,0.45)",
-          }}
+          className={`inline-flex h-10 items-center justify-center rounded-md px-6 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 ${
+            validFiles.length > 0 && status !== "uploading"
+              ? "bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-medium border border-[#8b5cf6]"
+              : "bg-[#f4f4f5] border border-[#e4e4e7] text-[#a1a1aa]"
+          }`}
         >
           {status === "uploading" ? "Generating…" : "Upload files"}
         </button>
 
-        <p className="text-xs text-[#8f8798]">
+        <p className="text-xs text-[#71717a]">
           Allowed: {ACCEPTED_EXTENSIONS.join(", ")}
         </p>
       </div>
@@ -393,18 +332,14 @@ export default function FileUpload() {
         <div
           role="status"
           aria-live="polite"
-          className="mt-4 flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#f0ecf4] ring-1 ring-[#a78bfa]/35 backdrop-blur-xl"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(167,139,250,0.12) 0%, rgba(12,9,18,0.9) 55%, rgba(6,5,9,0.95) 100%)",
-          }}
+          className="mt-4 flex items-center gap-3 rounded-md border border-[#e4e4e7] bg-[#fafafa] px-4 py-3 text-sm text-[#09090b]"
         >
           <Spinner />
           <div className="min-w-0">
             <span className="qa-shimmer-text text-sm font-medium">
               {GENERATING_PHRASES[phraseIdx]}…
             </span>
-            <p className="mt-0.5 text-xs text-[#8f8798]">
+            <p className="mt-0.5 text-xs text-[#71717a]">
               This may take a moment — please don’t close this tab.
             </p>
           </div>
@@ -414,17 +349,11 @@ export default function FileUpload() {
       {message && status !== "uploading" && (
         <p
           role="status"
-          className={`mt-4 rounded-xl px-4 py-3 text-sm backdrop-blur-xl ${
+          className={`mt-4 rounded-md border px-4 py-3 text-sm ${
             status === "success"
-              ? "text-[#f0ecf4] ring-1 ring-[#a78bfa]/35"
-              : "text-[#f0a8c8] ring-1 ring-[#a78bfa]/15"
+              ? "border-[#e4e4e7] bg-[#fafafa] text-[#09090b]"
+              : "border-[#fee2e2] bg-[#fef2f2] text-[#ef4444]"
           }`}
-          style={{
-            background:
-              status === "success"
-                ? "linear-gradient(180deg, rgba(167,139,250,0.12) 0%, rgba(12,9,18,0.9) 55%, rgba(6,5,9,0.95) 100%)"
-                : "linear-gradient(180deg, rgba(20,10,28,0.6) 0%, rgba(8,6,11,0.95) 100%)",
-          }}
         >
           {message}
         </p>
@@ -436,7 +365,7 @@ export default function FileUpload() {
 function Spinner() {
   return (
     <svg
-      className="h-5 w-5 shrink-0 animate-spin text-[#c4b5fd]"
+      className="h-5 w-5 shrink-0 animate-spin text-[#8b5cf6]"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="none"

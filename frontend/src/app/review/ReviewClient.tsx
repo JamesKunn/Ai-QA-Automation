@@ -18,6 +18,17 @@ type StoredPayload = {
   n8nData: unknown;
 };
 
+type StoriesStatus = "idle" | "generating" | "error";
+
+/** Pull the bounded PRD text the stage-1 workflow returns alongside epics. */
+function extractPrdText(n8nData: unknown): string {
+  if (n8nData && typeof n8nData === "object" && "prdText" in n8nData) {
+    const v = (n8nData as Record<string, unknown>).prdText;
+    if (typeof v === "string") return v;
+  }
+  return "";
+}
+
 type ColumnMeta = {
   key: string;
   /** Tailwind/inline width hint */
@@ -140,6 +151,8 @@ export default function ReviewClient() {
   const [rows, setRows] = useState<Row[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [query, setQuery] = useState("");
+  const [storiesStatus, setStoriesStatus] = useState<StoriesStatus>("idle");
+  const [storiesMessage, setStoriesMessage] = useState<string | null>(null);
 
   // Hydrate from sessionStorage. Edits are stamped with the upload's
   // `uploadedAt`; we only restore them if that stamp matches the current
@@ -257,6 +270,51 @@ export default function ReviewClient() {
     try {
       sessionStorage.removeItem(EDITS_KEY);
     } catch {}
+  }
+
+  async function generateUserStories() {
+    if (!payload || rows.length === 0) return;
+    setStoriesStatus("generating");
+    setStoriesMessage(null);
+    try {
+      const res = await fetch("/api/generate-user-stories", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          prdText: extractPrdText(payload.n8nData),
+          epics: rows,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setStoriesStatus("error");
+        setStoriesMessage(data.error ?? "Failed to generate user stories.");
+        return;
+      }
+
+      // Stash for the (upcoming) /stories screen, stamped with the same
+      // upload so it can be matched/discarded the way /review does.
+      if (data.n8nData) {
+        try {
+          sessionStorage.setItem(
+            "qa.stories.payload",
+            JSON.stringify({
+              uploadedAt: payload.uploadedAt,
+              n8nData: data.n8nData,
+            }),
+          );
+        } catch {
+          /* quota or disabled — ignore */
+        }
+      }
+
+      setStoriesStatus("idle");
+      setStoriesMessage(data.n8nStatus ?? data.message ?? "Done.");
+    } catch {
+      setStoriesStatus("error");
+      setStoriesMessage("Network error. Please try again.");
+    }
   }
 
   function downloadXlsx() {
@@ -498,14 +556,39 @@ export default function ReviewClient() {
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={downloadXlsx}
-          className="inline-flex h-10 items-center justify-center rounded-md bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-5 text-sm font-medium transition-colors border border-[#8b5cf6]"
-        >
-          Download as Excel
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={generateUserStories}
+            disabled={storiesStatus === "generating"}
+            className="inline-flex h-10 items-center justify-center rounded-md border border-[#8b5cf6] bg-[#ffffff] text-[#8b5cf6] hover:bg-[#f4f4f5] px-5 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50"
+          >
+            {storiesStatus === "generating"
+              ? "Generating…"
+              : "Generate User Stories"}
+          </button>
+          <button
+            type="button"
+            onClick={downloadXlsx}
+            className="inline-flex h-10 items-center justify-center rounded-md bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-5 text-sm font-medium transition-colors border border-[#8b5cf6]"
+          >
+            Download as Excel
+          </button>
+        </div>
       </div>
+
+      {storiesMessage && (
+        <p
+          role="status"
+          className={`mt-4 rounded-md border px-4 py-3 text-sm ${
+            storiesStatus === "error"
+              ? "border-[#fee2e2] bg-[#fef2f2] text-[#ef4444]"
+              : "border-[#e4e4e7] bg-[#fafafa] text-[#09090b]"
+          }`}
+        >
+          {storiesMessage}
+        </p>
+      )}
     </div>
   );
 }

@@ -29,8 +29,8 @@ const STORIES_REVIEW_CONFIG = {
     "acceptance_criteria",
     "status",
     "timestamp",
-    "workflow",
   ],
+  excludeColumns: ["workflow"],
 };
 
 export default function StoriesClient() {

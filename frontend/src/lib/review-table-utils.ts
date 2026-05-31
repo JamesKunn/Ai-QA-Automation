@@ -89,10 +89,14 @@ export function extractPrdText(n8nData: unknown): string {
 export function deriveColumns(
   rows: ReviewRow[],
   preferredOrder?: string[],
+  exclude?: string[],
 ): string[] {
+  const excluded = new Set(exclude ?? []);
   const seen = new Set<string>();
   for (const row of rows) {
-    for (const k of Object.keys(row)) seen.add(k);
+    for (const k of Object.keys(row)) {
+      if (!excluded.has(k)) seen.add(k);
+    }
   }
   if (!preferredOrder?.length) return Array.from(seen);
   const ordered = preferredOrder.filter((k) => seen.has(k));

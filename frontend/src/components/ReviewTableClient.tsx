@@ -26,6 +26,7 @@ export type ReviewTableConfig = {
   emptyNoRows: string;
   rowArrayKeys?: string[];
   columnOrder?: string[];
+  excludeColumns?: string[];
 };
 
 type ReviewTableClientProps = {
@@ -90,6 +91,7 @@ export default function ReviewTableClient({
     emptyNoRows,
     rowArrayKeys,
     columnOrder,
+    excludeColumns,
   } = config;
 
   const [payload, setPayload] = useState<StoredPayload | null>(null);
@@ -151,8 +153,8 @@ export default function ReviewTableClient({
   }, [rows, hydrated, payload, editsKey]);
 
   const columns = useMemo(
-    () => deriveColumns(rows, columnOrder),
-    [rows, columnOrder],
+    () => deriveColumns(rows, columnOrder, excludeColumns),
+    [rows, columnOrder, excludeColumns],
   );
   const columnPlan = useMemo(() => planColumns(columns), [columns]);
 
